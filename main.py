@@ -5,6 +5,7 @@ import asyncio
 import threading
 import logging
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -18,13 +19,72 @@ logger = logging.getLogger('discord_bot_dashboard')
 
 # Import bot modules
 from config import CONFIG, LANGUAGES, LANGUAGE_TO_FLAG
-from database import db
 from utils.language_utils import get_language_name
 from bot import TranslatorBot
 
 # Create Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
+
+# Configure database
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+
+# Import and initialize database models
+from models import db, User, Server, Channel, TranslationLog, BotSetting, APIKey
+db.init_app(app)
+
+# Initialize database and settings
+def initialize_database():
+    """Initialize database tables and basic settings"""
+    try:
+        db.create_all()
+        
+        # Initialize settings
+        if not BotSetting.query.filter_by(key='default_language').first():
+            db.session.execute(db.insert(BotSetting).values(
+                key='default_language',
+                value='en'
+            ))
+        
+        # Add bot token if available
+        discord_token = os.environ.get("DISCORD_BOT_TOKEN", "")
+        if discord_token and not BotSetting.query.filter_by(key='discord_bot_token').first():
+            db.session.execute(db.insert(BotSetting).values(
+                key='discord_bot_token',
+                value=discord_token
+            ))
+        
+        # Add API keys from environment if they exist
+        google_key = os.environ.get("GOOGLE_TRANSLATE_API_KEY", "")
+        if google_key and not APIKey.query.filter_by(service='google').first():
+            db.session.execute(db.insert(APIKey).values(
+                service='google',
+                key=google_key,
+                is_active=True
+            ))
+        
+        libre_key = os.environ.get("LIBRETRANSLATE_API_KEY", "")
+        if libre_key and not APIKey.query.filter_by(service='libre').first():
+            db.session.execute(db.insert(APIKey).values(
+                service='libre',
+                key=libre_key,
+                is_active=True
+            ))
+        
+        db.session.commit()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error initializing database: {e}")
+
+# Create database tables
+with app.app_context():
+    initialize_database()
 
 # Global variables
 bot_instance = None
@@ -53,6 +113,26 @@ def run_bot_forever(token):
             async def on_ready():
                 bot_status["connected_servers"] = len(bot_instance.guilds)
                 logger.info(f'Bot connected to {len(bot_instance.guilds)} guilds')
+                
+                # Log servers in database
+                for guild in bot_instance.guilds:
+                    # Check if server exists in database
+                    server = Server.query.filter_by(discord_id=str(guild.id)).first()
+                    if not server:
+                        # Add server to database
+                        new_server = Server(
+                            discord_id=str(guild.id),
+                            name=guild.name,
+                            auto_translate_enabled=False
+                        )
+                        db.session.add(new_server)
+                        
+                # Commit all server changes
+                try:
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+                    logger.error(f"Error saving servers to database: {e}")
             
             # Start the bot with token
             await bot_instance.start(token)
@@ -93,13 +173,17 @@ def stop_bot():
 @app.route('/')
 def index():
     """Main dashboard page"""
-    discord_token = os.environ.get("DISCORD_BOT_TOKEN", "")
-    google_key = os.environ.get("GOOGLE_TRANSLATE_API_KEY", "")
-    libre_key = os.environ.get("LIBRETRANSLATE_API_KEY", "")
+    # Get settings from database
+    token_setting = BotSetting.query.filter_by(key='discord_bot_token').first()
     
-    token_set = bool(discord_token)
-    google_api_key_set = bool(google_key)
-    libre_api_key_set = bool(libre_key)
+    # Get API keys from database
+    google_api_key = APIKey.query.filter_by(service='google').first()
+    libre_api_key = APIKey.query.filter_by(service='libre').first()
+    
+    # Check if settings are set
+    token_set = bool(token_setting and token_setting.value)
+    google_api_key_set = bool(google_api_key and google_api_key.key)
+    libre_api_key_set = bool(libre_api_key and libre_api_key.key)
     
     # Get available languages
     languages = []
@@ -112,6 +196,14 @@ def index():
             "name": language_name
         })
     
+    # Get stats from database if available
+    stats = {
+        "total_servers": Server.query.count(),
+        "total_users": User.query.count(),
+        "total_translations": TranslationLog.query.count(),
+        "recent_translations": TranslationLog.query.order_by(TranslationLog.timestamp.desc()).limit(5).all()
+    }
+    
     return render_template(
         'index.html',
         bot_status=bot_status,
@@ -119,7 +211,8 @@ def index():
         google_api_key_set=google_api_key_set,
         libre_api_key_set=libre_api_key_set,
         languages=languages,
-        config=CONFIG
+        config=CONFIG,
+        stats=stats
     )
 
 @app.route('/start_bot', methods=['POST'])
