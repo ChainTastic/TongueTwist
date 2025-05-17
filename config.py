@@ -47,8 +47,8 @@ TRANSLATION_SERVICES = {
     },
     'libre': {
         'api_key': os.getenv('LIBRETRANSLATE_API_KEY', ''),
-        'base_url': os.getenv('LIBRETRANSLATE_URL', 'https://libretranslate.de/translate'),
-        'enabled': True,  # Always enable LibreTranslate as our free option
+        'base_url': os.getenv('LIBRETRANSLATE_URL', 'https://libretranslate.de'),
+        'enabled': True,
     }
 }
 

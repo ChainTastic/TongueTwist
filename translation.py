@@ -124,6 +124,9 @@ class TranslationService:
             if not base_url:
                 base_url = "https://libretranslate.de/translate"
                 logger.info("Using public LibreTranslate instance")
+
+            if not base_url.endswith('/translate'):
+                base_url = base_url.rstrip('/') + '/translate'
             
             session = await self.get_session()
             
