@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="700" height="400" viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="700" height="400" fill="#2c2f33"/>
+  
+  <!-- Header -->
+  <rect width="700" height="60" fill="#23272a"/>
+  <text x="30" y="38" font-family="Arial" font-size="22" fill="#ffffff">Discord Developer Portal</text>
+  
+  <!-- Sidebar -->
+  <rect x="0" y="60" width="180" height="340" fill="#2c2f33"/>
+  <rect x="0" y="140" width="180" height="40" fill="#7289da" opacity="0.3"/>
+  
+  <!-- Sidebar items -->
+  <text x="20" y="90" font-family="Arial" font-size="14" fill="#ffffff">General Information</text>
+  <text x="20" y="120" font-family="Arial" font-size="14" fill="#ffffff">OAuth2</text>
+  <text x="20" y="165" font-family="Arial" font-size="14" fill="#ffffff" font-weight="bold">Bot</text>
+  <text x="20" y="195" font-family="Arial" font-size="14" fill="#ffffff">URL Generator</text>
+  
+  <!-- Main content area -->
+  <rect x="180" y="60" width="520" height="340" fill="#36393f"/>
+  
+  <!-- Bot section header -->
+  <text x="200" y="90" font-family="Arial" font-size="24" fill="#ffffff">Bot</text>
+  
+  <!-- Bot settings section -->
+  <rect x="200" y="110" width="480" height="100" rx="5" fill="#2f3136"/>
+  <text x="220" y="140" font-family="Arial" font-size="18" fill="#ffffff">Build-A-Bot</text>
+  <text x="220" y="170" font-family="Arial" font-size="14" fill="#b9bbbe">
+    A wild bot has appeared! Add it to your server or create a server for it to be most effective.
+  </text>
+  
+  <!-- Privileged Gateway Intents section -->
+  <rect x="200" y="230" width="480" height="150" rx="5" fill="#2f3136"/>
+  <text x="220" y="260" font-family="Arial" font-size="18" fill="#ffffff">Privileged Gateway Intents</text>
+  <text x="220" y="285" font-family="Arial" font-size="14" fill="#b9bbbe">
+    Enables your bot to receive events described below. These events are considered sensitive and
+    privileged, which means your bot needs approval to use them after reaching 100 servers.
+  </text>
+  
+  <!-- Intents toggles -->
+  <rect x="220" y="310" width="440" height="30" rx="15" fill="#36393f"/>
+  <rect x="220" y="310" width="30" height="30" rx="15" fill="#7289da"/>
+  <text x="270" y="330" font-family="Arial" font-size="14" fill="#ffffff">PRESENCE INTENT</text>
+  
+  <rect x="220" y="350" width="440" height="30" rx="15" fill="#36393f"/>
+  <rect x="220" y="350" width="30" height="30" rx="15" fill="#7289da"/>
+  <text x="270" y="370" font-family="Arial" font-size="14" fill="#ffffff">SERVER MEMBERS INTENT</text>
+  <rect x="600" y="350" width="30" height="30" rx="15" fill="#7289da"/>
+  <circle cx="615" cy="365" r="10" fill="#ffffff"/>
+  
+  <rect x="220" y="390" width="440" height="30" rx="15" fill="#36393f"/>
+  <rect x="220" y="390" width="30" height="30" rx="15" fill="#7289da"/>
+  <text x="270" y="410" font-family="Arial" font-size="14" fill="#ffffff">MESSAGE CONTENT INTENT</text>
+  <rect x="600" y="390" width="30" height="30" rx="15" fill="#7289da"/>
+  <circle cx="615" cy="405" r="10" fill="#ffffff"/>
+  
+  <!-- Highlight the two required intents -->
+  <rect x="550" y="350" width="100" height="30" rx="15" stroke="#ffcc00" stroke-width="3" fill="none"/>
+  <rect x="550" y="390" width="100" height="30" rx="15" stroke="#ffcc00" stroke-width="3" fill="none"/>
+  
+  <!-- Callouts -->
+  <path d="M 510,365 L 540,300 L 640,300 L 640,330 L 540,330 L 510,365" fill="#ffcc00" opacity="0.3"/>
+  <text x="550" y="320" font-family="Arial" font-size="14" fill="#ffffff" font-weight="bold">Enable this!</text>
+  
+  <path d="M 510,405 L 540,450 L 640,450 L 640,480 L 540,480 L 510,405" fill="#ffcc00" opacity="0.3"/>
+  <text x="550" y="470" font-family="Arial" font-size="14" fill="#ffffff" font-weight="bold">Enable this!</text>
+</svg>

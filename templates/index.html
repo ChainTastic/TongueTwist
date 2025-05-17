@@ -51,6 +51,7 @@
                                 <button type="submit" class="btn btn-success">Start Bot</button>
                                 {% endif %}
                             </form>
+                            <a href="{{ url_for('bot_setup') }}" class="btn btn-info ms-2">Setup Instructions</a>
                         {% else %}
                             <form action="{{ url_for('stop_bot_route') }}" method="post">
                                 <button type="submit" class="btn btn-danger">Stop Bot</button>

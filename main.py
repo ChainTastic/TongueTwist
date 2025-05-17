@@ -340,5 +340,10 @@ def help_page():
     """Show help information"""
     return render_template('help.html')
 
+@app.route('/bot_setup')
+def bot_setup():
+    """Show bot setup guide"""
+    return render_template('bot_setup.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Discord Translation Bot - Bot Setup Guide{% endblock %}
+
+{% block content %}
+<div class="card bg-dark border-primary mb-4">
+    <div class="card-header bg-primary bg-opacity-25">
+        <h2 class="card-title mb-0">Discord Bot Setup Guide</h2>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <h4 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Important!</h4>
+            <p>Your bot requires privileged intents to function properly. Please follow this guide to enable them in the Discord Developer Portal.</p>
+        </div>
+        
+        <h3 class="mt-4">Step 1: Go to Discord Developer Portal</h3>
+        <p>Visit the <a href="https://discord.com/developers/applications" target="_blank">Discord Developer Portal</a> and select your bot application.</p>
+        
+        <h3 class="mt-4">Step 2: Enable Privileged Intents</h3>
+        <ol>
+            <li>Click on the "Bot" tab in the left sidebar</li>
+            <li>Scroll down to "Privileged Gateway Intents"</li>
+            <li>Enable <strong>SERVER MEMBERS INTENT</strong></li>
+            <li>Enable <strong>MESSAGE CONTENT INTENT</strong></li>
+            <li>Click the "Save Changes" button</li>
+        </ol>
+        
+        <div class="text-center my-4">
+            <img src="{{ url_for('static', filename='img/privileged_intents.svg') }}" alt="Privileged Intents Settings" class="img-fluid rounded border border-secondary" style="max-width: 600px;">
+        </div>
+        
+        <h3 class="mt-4">Step 3: Add Bot to Your Server</h3>
+        <p>Use the following link to add your bot to your Discord server:</p>
+        
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" value="https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=275951680064&scope=bot%20applications.commands" readonly id="inviteLink">
+            <button class="btn btn-outline-secondary" type="button" onclick="copyInviteLink()">Copy</button>
+        </div>
+        <small class="text-muted">Replace YOUR_CLIENT_ID with your bot's client ID from the "General Information" tab.</small>
+        
+        <div class="alert alert-info mt-4">
+            <h5><i class="bi bi-info-circle"></i> What permissions are needed?</h5>
+            <ul>
+                <li><strong>Read Messages/View Channels</strong> - To see messages for translation</li>
+                <li><strong>Send Messages</strong> - To send translated content</li>
+                <li><strong>Add Reactions</strong> - For the reaction translation feature</li>
+                <li><strong>Read Message History</strong> - To access messages that need translation</li>
+                <li><strong>Use External Emojis</strong> - For flag emojis</li>
+                <li><strong>Manage Messages</strong> - For translation indicators</li>
+            </ul>
+        </div>
+        
+        <h3 class="mt-4">Step 4: Start the Bot</h3>
+        <p>After completing the steps above, return to the <a href="{{ url_for('index') }}">dashboard</a> and click "Start Bot".</p>
+        
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-primary"><i class="bi bi-arrow-left"></i> Return to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyInviteLink() {
+    var linkInput = document.getElementById('inviteLink');
+    linkInput.select();
+    document.execCommand('copy');
+    
+    // Show a tooltip or some feedback
+    alert('Invite link copied to clipboard!');
+}
+</script>
+{% endblock %}
