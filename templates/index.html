@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Discord Translation Bot - Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card bg-dark border-primary">
+            <div class="card-header bg-primary bg-opacity-25">
+                <h2 class="card-title mb-0">
+                    <i class="bi bi-robot me-2"></i>Bot Status
+                </h2>
+            </div>
+            <div class="card-body">
+                <div id="status-panel">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="status-indicator me-3">
+                            <span id="status-circle" class="circle {% if bot_status.running %}bg-success{% else %}bg-danger{% endif %}"></span>
+                        </div>
+                        <div>
+                            <h4 id="status-text" class="mb-0">
+                                {% if bot_status.running %}
+                                    Bot is running
+                                {% else %}
+                                    Bot is not running
+                                {% endif %}
+                            </h4>
+                            <p id="status-details" class="text-muted mb-0">
+                                {% if bot_status.running %}
+                                    Connected to {{ bot_status.connected_servers }} server(s)
+                                {% else %}
+                                    {% if bot_status.error %}
+                                        Error: {{ bot_status.error }}
+                                    {% else %}
+                                        Ready to start
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        {% if not bot_status.running %}
+                            <form action="{{ url_for('start_bot') }}" method="post">
+                                {% if not token_set %}
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" name="token" placeholder="Enter Discord Bot Token" required>
+                                    <button type="submit" class="btn btn-success">Start Bot</button>
+                                </div>
+                                {% else %}
+                                <button type="submit" class="btn btn-success">Start Bot</button>
+                                {% endif %}
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('stop_bot_route') }}" method="post">
+                                <button type="submit" class="btn btn-danger">Stop Bot</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-dark border-info h-100">
+            <div class="card-header bg-info bg-opacity-25">
+                <h3 class="card-title mb-0">Translation API Keys</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('set_api_keys') }}" method="post">
+                    <div class="mb-3">
+                        <label for="google_key" class="form-label">Google Translate API Key</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="google_key" name="google_key" 
+                                placeholder="{% if google_api_key_set %}API key is set{% else %}Enter Google Translate API Key{% endif %}">
+                            <button class="btn btn-outline-secondary toggle-password" type="button">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Required for Google Translate functionality</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="libre_key" class="form-label">LibreTranslate API Key (Optional)</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="libre_key" name="libre_key" 
+                                placeholder="{% if libre_api_key_set %}API key is set{% else %}Enter LibreTranslate API Key{% endif %}">
+                            <button class="btn btn-outline-secondary toggle-password" type="button">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="libre_url" class="form-label">LibreTranslate URL (Optional)</label>
+                        <input type="text" class="form-control" id="libre_url" name="libre_url" 
+                            placeholder="https://libretranslate.com/translate">
+                        <small class="form-text text-muted">Only needed if using a custom LibreTranslate server</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save API Keys</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card bg-dark border-warning h-100">
+            <div class="card-header bg-warning bg-opacity-25">
+                <h3 class="card-title mb-0">Supported Languages</h3>
+            </div>
+            <div class="card-body">
+                <div class="language-grid">
+                    {% for language in languages %}
+                    <div class="language-item">
+                        <span class="language-flag">{{ language.flag }}</span>
+                        <span class="language-name">{{ language.name }}</span>
+                        <span class="language-code">{{ language.code }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-secondary bg-opacity-25">
+                <h3 class="card-title mb-0">Bot Features</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔄</div>
+                            <h4>Auto Translation</h4>
+                            <p>Automatically translates messages in configured channels to users' preferred languages.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🚩</div>
+                            <h4>Flag Reactions</h4>
+                            <p>Users can react with flag emojis to translate messages into specific languages.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">⌨️</div>
+                            <h4>Slash Commands</h4>
+                            <p>Use /translate to quickly translate text to any supported language.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Function to update bot status
+    function updateBotStatus() {
+        fetch('/bot_status')
+            .then(response => response.json())
+            .then(data => {
+                const statusCircle = document.getElementById('status-circle');
+                const statusText = document.getElementById('status-text');
+                const statusDetails = document.getElementById('status-details');
+                
+                if (data.running) {
+                    statusCircle.className = 'circle bg-success';
+                    statusText.textContent = 'Bot is running';
+                    statusDetails.textContent = `Connected to ${data.connected_servers} server(s)`;
+                } else {
+                    statusCircle.className = 'circle bg-danger';
+                    statusText.textContent = 'Bot is not running';
+                    if (data.error) {
+                        statusDetails.textContent = `Error: ${data.error}`;
+                    } else {
+                        statusDetails.textContent = 'Ready to start';
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching bot status:', error));
+    }
+    
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.closest('.input-group').querySelector('input');
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+    });
+    
+    // Update status periodically
+    setInterval(updateBotStatus, 5000);
+</script>
+{% endblock %}

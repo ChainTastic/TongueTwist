@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Discord Translation Bot - Help{% endblock %}
+
+{% block content %}
+<div class="card bg-dark border-info mb-4">
+    <div class="card-header bg-info bg-opacity-25">
+        <h2 class="card-title mb-0">Help & Documentation</h2>
+    </div>
+    <div class="card-body">
+        <h3>Getting Started</h3>
+        <ol class="mb-4">
+            <li class="mb-2">Create a Discord Bot on the <a href="https://discord.com/developers/applications" target="_blank">Discord Developer Portal</a></li>
+            <li class="mb-2">Add the bot to your server with appropriate permissions</li>
+            <li class="mb-2">Copy your bot token and enter it in the dashboard</li>
+            <li class="mb-2">Configure your translation settings</li>
+            <li class="mb-2">Start the bot from the dashboard</li>
+        </ol>
+
+        <h3>Bot Features</h3>
+        <div class="accordion accordion-flush mb-4" id="featuresAccordion">
+            <div class="accordion-item bg-dark">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#autoTranslate">
+                        Auto Translation
+                    </button>
+                </h2>
+                <div id="autoTranslate" class="accordion-collapse collapse" data-bs-parent="#featuresAccordion">
+                    <div class="accordion-body">
+                        <p>The bot can automatically translate messages in specific channels to each user's preferred language.</p>
+                        <h5>Commands:</h5>
+                        <ul>
+                            <li><code>!autotranslate</code> - Show auto-translation settings</li>
+                            <li><code>!autotranslate enable</code> - Enable auto-translation for the server</li>
+                            <li><code>!autotranslate disable</code> - Disable auto-translation for the server</li>
+                            <li><code>!autotranslate add #channel</code> - Add a channel to auto-translation</li>
+                            <li><code>!autotranslate remove #channel</code> - Remove a channel from auto-translation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item bg-dark">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#reactionTranslate">
+                        Reaction-based Translation
+                    </button>
+                </h2>
+                <div id="reactionTranslate" class="accordion-collapse collapse" data-bs-parent="#featuresAccordion">
+                    <div class="accordion-body">
+                        <p>Users can add country flag emoji reactions to translate messages to the corresponding language.</p>
+                        <p>For example, reacting with 🇫🇷 will translate the message to French.</p>
+                        <h5>Commands:</h5>
+                        <ul>
+                            <li><code>!flags</code> or <code>!languages</code> - Show a list of supported flags and languages</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item bg-dark">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#slashCommands">
+                        Slash Commands
+                    </button>
+                </h2>
+                <div id="slashCommands" class="accordion-collapse collapse" data-bs-parent="#featuresAccordion">
+                    <div class="accordion-body">
+                        <p>The bot provides several slash commands for translation and configuration.</p>
+                        <h5>Commands:</h5>
+                        <ul>
+                            <li><code>/translate</code> - Translate text to another language</li>
+                            <li><code>/setlanguage</code> - Set your preferred language for translations</li>
+                            <li><code>/language</code> - Show your current preferred language</li>
+                            <li><code>/languages</code> - Show available languages for translation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Translation API Setup</h3>
+        <p>The bot supports two translation services:</p>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-header bg-secondary bg-opacity-25">Google Translate API</div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Create a Google Cloud Platform account</li>
+                            <li>Create a new project</li>
+                            <li>Enable the Cloud Translation API</li>
+                            <li>Create API credentials and get your API key</li>
+                            <li>Enter your API key in the dashboard</li>
+                        </ol>
+                        <p><small class="text-muted">Note: Google Translate API is a paid service, but offers high-quality translation.</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-header bg-secondary bg-opacity-25">LibreTranslate API</div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Visit <a href="https://libretranslate.com" target="_blank">LibreTranslate</a></li>
+                            <li>Sign up for an API key (if required)</li>
+                            <li>Enter your API key in the dashboard</li>
+                            <li>(Optional) Set up your own LibreTranslate server</li>
+                        </ol>
+                        <p><small class="text-muted">Note: LibreTranslate is a free and open-source alternative, but may have usage limits.</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
