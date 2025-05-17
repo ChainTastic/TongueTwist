@@ -6,7 +6,10 @@
   },
   "guilds": {
     "836721069674856478": {
-      "auto_translate": true
+      "auto_translate": true,
+      "auto_translate_channels": [
+        "836721069674856480"
+      ]
     }
   }
 }
