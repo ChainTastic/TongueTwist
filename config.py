@@ -43,16 +43,16 @@ TRANSLATION_SERVICES = {
     'google': {
         'api_key': os.getenv('GOOGLE_TRANSLATE_API_KEY', ''),
         'base_url': 'https://translation.googleapis.com/language/translate/v2',
-        'enabled': True,
+        'enabled': os.getenv('GOOGLE_TRANSLATE_API_KEY', '') != '',
     },
     'libre': {
         'api_key': os.getenv('LIBRETRANSLATE_API_KEY', ''),
-        'base_url': os.getenv('LIBRETRANSLATE_URL', 'https://libretranslate.com/translate'),
-        'enabled': os.getenv('LIBRETRANSLATE_API_KEY', '') != '',
+        'base_url': os.getenv('LIBRETRANSLATE_URL', 'https://libretranslate.de/translate'),
+        'enabled': True,  # Always enable LibreTranslate as our free option
     }
 }
 
 # Choose which translation service to use
-DEFAULT_TRANSLATION_SERVICE = 'google'
-if not TRANSLATION_SERVICES['google']['api_key'] and TRANSLATION_SERVICES['libre']['enabled']:
-    DEFAULT_TRANSLATION_SERVICE = 'libre'
+DEFAULT_TRANSLATION_SERVICE = 'libre'  # Default to free LibreTranslate
+if TRANSLATION_SERVICES['google']['api_key']:
+    DEFAULT_TRANSLATION_SERVICE = 'google'  # Use Google if API key is available

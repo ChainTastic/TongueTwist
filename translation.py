@@ -1,5 +1,6 @@
 import os
 import aiohttp
+import asyncio
 import logging
 import time
 from typing import Dict, Optional, Tuple, List
@@ -119,6 +120,11 @@ class TranslationService:
             api_key = TRANSLATION_SERVICES['libre']['api_key']
             base_url = TRANSLATION_SERVICES['libre']['base_url']
             
+            # Use a public LibreTranslate instance if none is configured
+            if not base_url:
+                base_url = "https://libretranslate.de/translate"
+                logger.info("Using public LibreTranslate instance")
+            
             session = await self.get_session()
             
             payload = {
@@ -133,22 +139,34 @@ class TranslationService:
             if source_lang:
                 payload['source'] = source_lang
             else:
-                payload['source'] = 'auto'
+                # If auto detection doesn't work, use English as fallback
+                payload['source'] = 'en'
             
-            async with session.post(base_url, json=payload) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    if 'translatedText' in data:
-                        return data['translatedText']
+            try:
+                timeout = aiohttp.ClientTimeout(total=10)
+                async with session.post(base_url, json=payload, timeout=timeout) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if 'translatedText' in data:
+                            return data['translatedText']
+                        else:
+                            logger.error(f"Unexpected LibreTranslate API response: {data}")
+                            return f"[Translation format error] {text}"
                     else:
-                        logger.error(f"Unexpected LibreTranslate API response: {data}")
-                        return text
-                else:
-                    logger.error(f"LibreTranslate API error: {response.status} - {await response.text()}")
-                    return text
+                        error_text = await response.text()
+                        logger.error(f"LibreTranslate API error: {response.status} - {error_text}")
+                        
+                        # Try fallback to simple translation indicator
+                        return f"[{target_lang}] {text}"
+            except asyncio.TimeoutError:
+                logger.warning("LibreTranslate request timed out")
+                return f"[Translation timeout] {text}"
+            except Exception as req_error:
+                logger.error(f"LibreTranslate request error: {req_error}")
+                return f"[Translation request error] {text}"
         except Exception as e:
             logger.error(f"Error translating with LibreTranslate: {e}")
-            return text
+            return f"[Translation failed] {text}"
     
     async def detect_language(self, text: str) -> str:
         """Detect the language of the text"""
