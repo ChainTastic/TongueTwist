@@ -7,6 +7,7 @@ import logging
 from dotenv import load_dotenv
 from datetime import datetime
 
+
 # Load environment variables
 load_dotenv()
 
@@ -27,7 +28,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
 
 # Configure database
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_recycle": 300,
@@ -115,26 +116,27 @@ def run_bot_forever(token):
             async def on_ready():
                 bot_status["connected_servers"] = len(bot_instance.guilds)
                 logger.info(f'Bot connected to {len(bot_instance.guilds)} guilds')
-                
+
                 # Log servers in database
-                for guild in bot_instance.guilds:
-                    # Check if server exists in database
-                    server = Server.query.filter_by(discord_id=str(guild.id)).first()
-                    if not server:
-                        # Add server to database
-                        new_server = Server(
-                            discord_id=str(guild.id),
-                            name=guild.name,
-                            auto_translate_enabled=False
-                        )
-                        db.session.add(new_server)
-                        
-                # Commit all server changes
-                try:
-                    db.session.commit()
-                except Exception as e:
-                    db.session.rollback()
-                    logger.error(f"Error saving servers to database: {e}")
+                with app.app_context():  # <-- ✅ Add this line
+                    for guild in bot_instance.guilds:
+                        # Check if server exists in database
+                        server = Server.query.filter_by(discord_id=str(guild.id)).first()
+                        if not server:
+                            # Add server to database
+                            new_server = Server(
+                                discord_id=str(guild.id),
+                                name=guild.name,
+                                auto_translate_enabled=False
+                            )
+                            db.session.add(new_server)
+
+                    # Commit all server changes
+                    try:
+                        db.session.commit()
+                    except Exception as e:
+                        db.session.rollback()
+                        logger.error(f"Error saving servers to database: {e}")
             
             # Start the bot with token
             await bot_instance.start(token)
