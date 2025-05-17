@@ -327,7 +327,13 @@ def set_api_keys():
 @app.route('/bot_status')
 def get_bot_status():
     """Get current bot status as JSON"""
-    return jsonify(bot_status)
+    try:
+        # Ensure we have the latest status
+        status_copy = bot_status.copy()
+        return jsonify(status_copy)
+    except Exception as e:
+        logger.error(f"Error getting bot status: {e}")
+        return jsonify({"running": False, "connected_servers": 0, "error": str(e)})
 
 @app.route('/help')
 def help_page():

@@ -12,10 +12,28 @@ class Database:
     def __init__(self, filename="user_preferences.json"):
         self.filename = filename
         self.data = {'users': {}, 'guilds': {}}
-        self._load()
+        # Initialize the data synchronously to avoid coroutine warning
+        self._load_sync()
     
+    def _load_sync(self):
+        """Load data from file synchronously"""
+        try:
+            if os.path.exists(self.filename):
+                with open(self.filename, 'r') as f:
+                    content = f.read()
+                    self.data = json.loads(content)
+                logger.info(f"Database loaded from {self.filename}")
+            else:
+                logger.info(f"No database file found, creating new one at {self.filename}")
+                # Create the file synchronously
+                with open(self.filename, 'w') as f:
+                    f.write(json.dumps(self.data, indent=2))
+                logger.info(f"Database saved to {self.filename}")
+        except Exception as e:
+            logger.error(f"Error loading database: {e}")
+            
     async def _load(self):
-        """Load data from file"""
+        """Load data from file asynchronously"""
         try:
             if os.path.exists(self.filename):
                 async with aiofiles.open(self.filename, 'r') as f:

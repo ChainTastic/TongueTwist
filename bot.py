@@ -17,10 +17,12 @@ from config import CONFIG
 
 # Create bot instance with all intents
 intents = discord.Intents.default()
-intents.message_content = True
+intents.message_content = True  # Privileged intent
 intents.reactions = True
-intents.members = True
+intents.members = True  # Privileged intent
 intents.guilds = True
+# Note: You must enable these intents in the Discord Developer Portal at
+# https://discord.com/developers/applications/YOUR_APP_ID/bot
 
 class TranslatorBot(commands.Bot):
     def __init__(self):
@@ -71,7 +73,20 @@ async def main():
     token = os.getenv("DISCORD_BOT_TOKEN")
     if not token:
         logger.error("No Discord bot token found. Please set the DISCORD_BOT_TOKEN environment variable.")
-        return
+        logger.info("Checking for token in .env file...")
+        try:
+            from dotenv import load_dotenv
+            # Try to reload in case it was updated
+            load_dotenv(override=True)
+            token = os.getenv("DISCORD_BOT_TOKEN")
+            if token:
+                logger.info("Found Discord bot token in .env file")
+            else:
+                logger.error("No Discord bot token found in .env file either.")
+                return
+        except Exception as e:
+            logger.error(f"Error loading from .env: {e}")
+            return
     
     try:
         logger.info("Starting bot...")
