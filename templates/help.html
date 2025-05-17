@@ -9,13 +9,26 @@
     </div>
     <div class="card-body">
         <h3>Getting Started</h3>
-        <ol class="mb-4">
-            <li class="mb-2">Create a Discord Bot on the <a href="https://discord.com/developers/applications" target="_blank">Discord Developer Portal</a></li>
-            <li class="mb-2">Add the bot to your server with appropriate permissions</li>
-            <li class="mb-2">Copy your bot token and enter it in the dashboard</li>
-            <li class="mb-2">Configure your translation settings</li>
-            <li class="mb-2">Start the bot from the dashboard</li>
-        </ol>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <ol class="mb-4">
+                    <li class="mb-2">Create a Discord Bot on the <a href="https://discord.com/developers/applications" target="_blank">Discord Developer Portal</a></li>
+                    <li class="mb-2">Add the bot to your server with appropriate permissions</li>
+                    <li class="mb-2">Copy your bot token and enter it in the dashboard</li>
+                    <li class="mb-2">Configure your translation settings</li>
+                    <li class="mb-2">Start the bot from the dashboard</li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-dark border-secondary mb-3">
+                    <div class="card-header bg-secondary bg-opacity-25">Where to find your Discord Bot Token</div>
+                    <div class="card-body text-center">
+                        <img src="{{ url_for('static', filename='img/discord_dev_portal.svg') }}" alt="Discord Developer Portal screenshot" class="img-fluid rounded mb-2" style="max-height: 200px;">
+                        <p class="card-text small">Go to the Discord Developer Portal, select your application, navigate to the Bot section, and copy your token</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <h3>Bot Features</h3>
         <div class="accordion accordion-flush mb-4" id="featuresAccordion">
@@ -84,8 +97,11 @@
                 <div class="card bg-dark border-secondary h-100">
                     <div class="card-header bg-secondary bg-opacity-25">Google Translate API</div>
                     <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img src="{{ url_for('static', filename='img/google_api_setup.svg') }}" alt="Google Cloud API setup" class="img-fluid rounded mb-2" style="max-height: 180px;">
+                        </div>
                         <ol>
-                            <li>Create a Google Cloud Platform account</li>
+                            <li>Create a <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Platform</a> account</li>
                             <li>Create a new project</li>
                             <li>Enable the Cloud Translation API</li>
                             <li>Create API credentials and get your API key</li>
@@ -99,6 +115,9 @@
                 <div class="card bg-dark border-secondary h-100">
                     <div class="card-header bg-secondary bg-opacity-25">LibreTranslate API</div>
                     <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img src="{{ url_for('static', filename='img/dashboard_setup.svg') }}" alt="Dashboard API setup" class="img-fluid rounded mb-2" style="max-height: 180px;">
+                        </div>
                         <ol>
                             <li>Visit <a href="https://libretranslate.com" target="_blank">LibreTranslate</a></li>
                             <li>Sign up for an API key (if required)</li>
@@ -106,6 +125,50 @@
                             <li>(Optional) Set up your own LibreTranslate server</li>
                         </ol>
                         <p><small class="text-muted">Note: LibreTranslate is a free and open-source alternative, but may have usage limits.</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Setting Up Your Bot</h3>
+        <div class="card bg-dark border-info mb-4">
+            <div class="card-header bg-info bg-opacity-25">Step-by-Step Guide</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <ol>
+                            <li class="mb-3">
+                                <strong>Discord Bot Setup:</strong>
+                                <p>Create your bot in the Discord Developer Portal and copy your token.</p>
+                            </li>
+                            <li class="mb-3">
+                                <strong>Dashboard Configuration:</strong>
+                                <p>Paste your Discord token in the dashboard and click "Start Bot".</p>
+                            </li>
+                            <li class="mb-3">
+                                <strong>Translation API Setup:</strong>
+                                <p>Enter your Google Translate or LibreTranslate API key.</p>
+                            </li>
+                            <li class="mb-3">
+                                <strong>Discord Server Setup:</strong>
+                                <p>Use the <code>!autotranslate</code> command to configure channels for auto-translation.</p>
+                            </li>
+                            <li class="mb-3">
+                                <strong>User Configuration:</strong>
+                                <p>Users can set their preferred language with <code>/setlanguage</code>.</p>
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-info-circle"></i> Quick Tips</h5>
+                            <ul>
+                                <li>The bot needs the "Message Content" intent enabled in the Discord Developer Portal</li>
+                                <li>Give the bot appropriate permissions when adding it to your server</li>
+                                <li>For optimal performance, use Google Translate API</li>
+                                <li>Set your preferred language with <code>/setlanguage</code> before using auto-translation</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
