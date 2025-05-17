@@ -1,5 +1,6 @@
 import os
 import aiohttp
+from aiohttp import ClientTimeout, ClientConnectionError
 import asyncio
 import logging
 import time
