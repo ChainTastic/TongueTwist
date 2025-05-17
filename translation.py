@@ -143,7 +143,7 @@ class TranslationService:
                 payload['source'] = 'en'
             
             try:
-                timeout = aiohttp.ClientTimeout(total=10)
+                timeout = aiohttp.ClientTimeout(total=5)
                 async with session.post(base_url, json=payload, timeout=timeout) as response:
                     if response.status == 200:
                         data = await response.json()
@@ -155,11 +155,9 @@ class TranslationService:
                     else:
                         error_text = await response.text()
                         logger.error(f"LibreTranslate API error: {response.status} - {error_text}")
-                        
-                        # Try fallback to simple translation indicator
                         return f"[{target_lang}] {text}"
-            except asyncio.TimeoutError:
-                logger.warning("LibreTranslate request timed out")
+            except (asyncio.TimeoutError, ClientConnectionError) as timeout_error:
+                logger.warning(f"LibreTranslate request timed out or failed to connect: {timeout_error}")
                 return f"[Translation timeout] {text}"
             except Exception as req_error:
                 logger.error(f"LibreTranslate request error: {req_error}")
