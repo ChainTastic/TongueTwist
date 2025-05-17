@@ -40,11 +40,21 @@ def run_bot_forever(token):
     global bot_instance, bot_status
     
     async def start_bot():
-        nonlocal bot_instance
+        # Use global inside the async function
+        global bot_instance
         try:
+            # Create and start the bot
             bot_instance = TranslatorBot()
             bot_status["running"] = True
             bot_status["error"] = None
+            
+            # Update connected servers count when bot is ready
+            @bot_instance.event
+            async def on_ready():
+                bot_status["connected_servers"] = len(bot_instance.guilds)
+                logger.info(f'Bot connected to {len(bot_instance.guilds)} guilds')
+            
+            # Start the bot with token
             await bot_instance.start(token)
         except discord.errors.LoginFailure:
             bot_status["running"] = False
@@ -59,9 +69,7 @@ def run_bot_forever(token):
                 await bot_instance.close()
             bot_status["running"] = False
     
-    # Initialize bot_instance in this scope so it can be used in the nested function
-    bot_instance = None
-    
+    # Create a new event loop for the bot
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(start_bot())
