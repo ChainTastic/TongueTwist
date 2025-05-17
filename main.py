@@ -89,10 +89,12 @@ with app.app_context():
 # Global variables
 bot_instance = None
 bot_thread = None
+status_lock = threading.Lock()
 bot_status = {
     "running": False,
     "connected_servers": 0,
-    "error": None
+    "error": None,
+    "last_update": datetime.now().timestamp()
 }
 
 def run_bot_forever(token):
@@ -327,13 +329,33 @@ def set_api_keys():
 @app.route('/bot_status')
 def get_bot_status():
     """Get current bot status as JSON"""
+    global bot_status, bot_instance, status_lock
+    
     try:
-        # Ensure we have the latest status
-        status_copy = bot_status.copy()
+        # Use lock to prevent race conditions
+        with status_lock:
+            # Update status if bot instance exists
+            if bot_instance and not bot_instance.is_closed():
+                bot_status["running"] = True
+                bot_status["connected_servers"] = len(bot_instance.guilds) if bot_instance.guilds else 0
+                bot_status["last_update"] = datetime.now().timestamp()
+            elif bot_status["running"]:
+                # Bot was running but isn't responding
+                bot_status["running"] = False
+                bot_status["error"] = "Bot connection lost"
+                
+            # Create a safe copy
+            status_copy = bot_status.copy()
+            
         return jsonify(status_copy)
     except Exception as e:
         logger.error(f"Error getting bot status: {e}")
-        return jsonify({"running": False, "connected_servers": 0, "error": str(e)})
+        return jsonify({
+            "running": False, 
+            "connected_servers": 0, 
+            "error": str(e),
+            "last_update": datetime.now().timestamp()
+        })
 
 @app.route('/help')
 def help_page():
