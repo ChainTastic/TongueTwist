@@ -26,7 +26,7 @@ async def send_translated_message(
         target_flag = LANGUAGE_TO_FLAG.get(target_lang, target_lang.upper())
 
         # Language label: e.g., "fr → en"
-        lang_label = f"{source_flag} {source_lang} → {target_flag} {target_lang}".upper()
+        lang_label = f"{source_flag} → {target_flag}"
 
         # Build the embed
         embed = discord.Embed(
