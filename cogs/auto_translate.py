@@ -114,15 +114,6 @@ class AutoTranslate(commands.Cog):
                             translated_text=translated_text,
                             target_lang=target_lang
                         )
-                # Send a message to the channel indicating translations are available
-                embed = discord.Embed(
-                    title="Translations Available",
-                    description="Click the 🌐 reaction to receive translations in your preferred language.",
-                    color=discord.Color(CONFIG['embed_color'])
-                )
-                embed.add_field(name="Original Message", value=content[:1024])
-                embed.set_footer(text=f"Translated from {source_lang} to {', '.join(translations.keys())}")
-                await message.channel.send(embed=embed)
             else:
                 # No translations were made, so just send the original message
                 embed = discord.Embed(
