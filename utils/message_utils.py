@@ -9,10 +9,6 @@ from utils.language_utils import get_language_name
 logger = logging.getLogger('discord')
 
 def language_code_to_flag(code: str) -> str:
-    """
-    Convert a 2-letter language or country code to a flag emoji.
-    If invalid or unknown, return 🌐.
-    """
     if not code or len(code) < 2:
         return "🌐"
     code = code[:2].upper()
