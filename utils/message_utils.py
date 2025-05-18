@@ -30,11 +30,11 @@ async def send_translated_message(
 
         # Username with translation label
         display_name = original_message.author.display_name
-        username = f"{display_name} ({source_flag} → {target_flag})"
+        username = f"{source_flag} → {target_flag} {original_message.author.display_name}"
 
         # Send message impersonating original user
         await webhook.send(
-            content=translated_text,
+            content=f"{translated_text}\n\n[🔗 Jump to Original]({original_message.jump_url})"
             username=username,
             avatar_url=original_message.author.display_avatar.url
         )
