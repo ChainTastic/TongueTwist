@@ -34,7 +34,7 @@ async def send_translated_message(
 
         # Send message impersonating original user
         await webhook.send(
-            content=f"{translated_text}\n\n[🔗 Jump to Original]({original_message.jump_url})"
+            content=f"{translated_text}\n\n[🔗 Jump to Original]({original_message.jump_url})",
             username=username,
             avatar_url=original_message.author.display_avatar.url
         )
