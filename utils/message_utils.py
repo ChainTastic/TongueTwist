@@ -10,50 +10,82 @@ logger = logging.getLogger('discord')
 
 
 async def send_translated_message(
-        channel: discord.TextChannel,
-        original_message: discord.Message,
-        translated_text: str,
-        target_lang: str,
-        requester: Optional[discord.User] = None
-) -> Optional[discord.Message]:
-    """Send a translated version of a message as an embed"""
+    channel: discord.TextChannel,
+    original_message: discord.Message,
+    translated_text: str,
+    source_lang: str,
+    target_lang: str
+):
     try:
-        # Detect source language
-        source_lang = await translation_service.detect_language(original_message.content)
-
-        # Get flags
+        # Get language flags
+        from config import LANGUAGE_TO_FLAG
         source_flag = LANGUAGE_TO_FLAG.get(source_lang, source_lang.upper())
         target_flag = LANGUAGE_TO_FLAG.get(target_lang, target_lang.upper())
 
-        # Language label: e.g., "fr → en"
-        lang_label = f"{source_flag} → {target_flag}"
+        # Get webhooks (or create one if missing)
+        webhooks = await channel.webhooks()
+        webhook = discord.utils.get(webhooks, name="TongueTwist")
+        if webhook is None:
+            webhook = await channel.create_webhook(name="TongueTwist")
 
-        # Build the embed
-        embed = discord.Embed(
-            description=translated_text,
-            color=discord.Color(CONFIG['embed_color']),
-            timestamp=original_message.created_at
-        )
+        # Username with translation label
+        display_name = original_message.author.display_name
+        username = f"{display_name} ({source_flag} → {target_flag})"
 
-        # Set author (who originally said the message)
-        embed.set_author(
-            name=f"{original_message.author.display_name} ({lang_label})",
-            icon_url=original_message.author.display_avatar.url
-        )
-
-        # Footer: extra info
-        footer_text = f"Translated to {get_language_name(target_lang)}"
-        if requester:
-            footer_text += f" • Requested by {requester.display_name}"
-        embed.set_footer(text=footer_text)
-
-        # Send the message, referencing the original
-        return await channel.send(
-            content=f"{target_flag} **Translated Message:**",
-            embed=embed,
-            reference=original_message,
-            mention_author=False
+        # Send message impersonating original user
+        await webhook.send(
+            content=translated_text,
+            username=username,
+            avatar_url=original_message.author.display_avatar.url
         )
     except Exception as e:
-        logger.error(f"Error sending translated message: {e}")
-        return None
+        logging.getLogger("discord").error(f"Webhook error: {e}")
+
+
+#         channel: discord.TextChannel,
+#         original_message: discord.Message,
+#         translated_text: str,
+#         target_lang: str,
+#         requester: Optional[discord.User] = None
+# ) -> Optional[discord.Message]:
+#     """Send a translated version of a message as an embed"""
+#     try:
+#         # Detect source language
+#         source_lang = await translation_service.detect_language(original_message.content)
+#
+#         # Get flags
+#         source_flag = LANGUAGE_TO_FLAG.get(source_lang, source_lang.upper())
+#         target_flag = LANGUAGE_TO_FLAG.get(target_lang, target_lang.upper())
+#
+#         # Language label: e.g., "fr → en"
+#         lang_label = f"{source_flag} → {target_flag}"
+#
+#         # Build the embed
+#         embed = discord.Embed(
+#             description=translated_text,
+#             color=discord.Color(CONFIG['embed_color']),
+#             timestamp=original_message.created_at
+#         )
+#
+#         # Set author (who originally said the message)
+#         embed.set_author(
+#             name=f"{original_message.author.display_name} ({lang_label})",
+#             icon_url=original_message.author.display_avatar.url
+#         )
+#
+#         # Footer: extra info
+#         footer_text = f"Translated to {get_language_name(target_lang)}"
+#         if requester:
+#             footer_text += f" • Requested by {requester.display_name}"
+#         embed.set_footer(text=footer_text)
+#
+#         # Send the message, referencing the original
+#         return await channel.send(
+#             content=f"{target_flag} **Translated Message:**",
+#             embed=embed,
+#             reference=original_message,
+#             mention_author=False
+#         )
+#     except Exception as e:
+#         logger.error(f"Error sending translated message: {e}")
+#         return None
