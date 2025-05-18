@@ -104,7 +104,8 @@ class AutoTranslate(commands.Cog):
                             await send_translated_message(
                                 channel=message.channel,
                                 original_message=message,
-                                translated_text=chunk,
+                                translated_text=translated_text,
+                                source_lang=source_lang,
                                 target_lang=target_lang
                             )
                     else:
@@ -112,6 +113,7 @@ class AutoTranslate(commands.Cog):
                             channel=message.channel,
                             original_message=message,
                             translated_text=translated_text,
+                            source_lang=source_lang,
                             target_lang=target_lang
                         )
             else:
