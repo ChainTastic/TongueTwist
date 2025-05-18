@@ -96,11 +96,24 @@ class AutoTranslate(commands.Cog):
                     # Check if the translated text exceeds Discord's character limit
                     if len(translated_text) > CONFIG['max_message_length']:
                         # Split the message into chunks
-                        chunks = [translated_text[i:i + CONFIG['max_message_length']] for i in range(0, len(translated_text), CONFIG['max_message_length'])]
+                        chunks = [
+                            translated_text[i:i + CONFIG['max_message_length']]
+                            for i in range(0, len(translated_text), CONFIG['max_message_length'])
+                        ]
                         for chunk in chunks:
-                            await send_translated_message(message.channel, chunk, target_lang)
+                            await send_translated_message(
+                                channel=message.channel,
+                                original_message=message,
+                                translated_text=chunk,
+                                target_lang=target_lang
+                            )
                     else:
-                        await send_translated_message(message.channel, translated_text, target_lang)
+                        await send_translated_message(
+                            channel=message.channel,
+                            original_message=message,
+                            translated_text=translated_text,
+                            target_lang=target_lang
+                        )
                 # Send a message to the channel indicating translations are available
                 embed = discord.Embed(
                     title="Translations Available",
