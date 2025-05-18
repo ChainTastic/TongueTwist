@@ -84,7 +84,59 @@ class AutoTranslate(commands.Cog):
                 
                 # Store original message reference
                 await db.add_message_translation(message.id, source_lang, content)
-                
+
+
+                # Replace the original message with a translated version
+                # for exemple : chaintastic (fr ➜ en)
+                # APP
+                #  — 11:31 PM
+                # Good morning
+                # Send translated messages to the channel
+                for target_lang, translated_text in translations.items():
+                    # Check if the translated text exceeds Discord's character limit
+                    if len(translated_text) > CONFIG['max_message_length']:
+                        # Split the message into chunks
+                        chunks = [translated_text[i:i + CONFIG['max_message_length']] for i in range(0, len(translated_text), CONFIG['max_message_length'])]
+                        for chunk in chunks:
+                            await send_translated_message(message.channel, chunk, target_lang)
+                    else:
+                        await send_translated_message(message.channel, translated_text, target_lang)
+                # Send a message to the channel indicating translations are available
+                embed = discord.Embed(
+                    title="Translations Available",
+                    description="Click the 🌐 reaction to receive translations in your preferred language.",
+                    color=discord.Color(CONFIG['embed_color'])
+                )
+                embed.add_field(name="Original Message", value=content[:1024])
+                embed.set_footer(text=f"Translated from {source_lang} to {', '.join(translations.keys())}")
+                await message.channel.send(embed=embed)
+            else:
+                # No translations were made, so just send the original message
+                embed = discord.Embed(
+                    title="Original Message",
+                    description=content[:1024],
+                    color=discord.Color(CONFIG['embed_color'])
+                )
+                embed.set_footer(text=f"Language: {source_lang}")
+                await message.channel.send(embed=embed)
+        except discord.Forbidden:
+            # Handle permission errors (e.g., bot cannot send messages)
+            logger.error(f"Permission error: {message.channel.name} - {message.content}")
+        except discord.NotFound:
+            # Handle message not found errors
+            logger.error(f"Message not found: {message.channel.name} - {message.content}")
+        except discord.HTTPException as e:
+            # Handle Discord API errors
+            logger.error(f"Discord API error: {e}")
+        except asyncio.TimeoutError:
+            # Handle timeout errors
+            logger.error("Timeout error while processing message.")
+        except KeyError as e:
+            # Handle missing keys in translations
+            logger.error(f"Key error in translations: {e}")
+        except ValueError as e:
+            # Handle value errors (e.g., invalid language codes)
+            logger.error(f"Value error in translations: {e}")
         except Exception as e:
             logger.error(f"Error in auto-translate: {e}")
     
