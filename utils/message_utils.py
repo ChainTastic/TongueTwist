@@ -8,6 +8,15 @@ from utils.language_utils import get_language_name
 
 logger = logging.getLogger('discord')
 
+def language_code_to_flag(code: str) -> str:
+    """
+    Convert a 2-letter language or country code to a flag emoji.
+    If invalid or unknown, return 🌐.
+    """
+    if not code or len(code) < 2:
+        return "🌐"
+    code = code[:2].upper()
+    return chr(ord(code[0]) + 127397) + chr(ord(code[1]) + 127397)
 
 async def send_translated_message(
     channel: discord.TextChannel,
@@ -19,8 +28,8 @@ async def send_translated_message(
     try:
         # Get language flags
         from config import LANGUAGE_TO_FLAG
-        source_flag = LANGUAGE_TO_FLAG.get(source_lang, source_lang.upper())
-        target_flag = LANGUAGE_TO_FLAG.get(target_lang, target_lang.upper())
+        source_flag = language_code_to_flag(source_lang)
+        target_flag = language_code_to_flag(target_lang)
 
         # Get webhooks (or create one if missing)
         webhooks = await channel.webhooks()
