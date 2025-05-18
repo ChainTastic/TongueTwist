@@ -49,10 +49,15 @@ TRANSLATION_SERVICES = {
         'api_key': os.getenv('LIBRETRANSLATE_API_KEY', ''),
         'base_url': os.getenv('LIBRETRANSLATE_URL', 'https://libretranslate.de'),
         'enabled': True,
+    },
+    'deepl': {
+        'enabled': True,
+        'api_key': os.getenv("DEEPL_API_KEY"),
+        'base_url': 'https://api-free.deepl.com/v2/translate'
     }
 }
 
 # Choose which translation service to use
-DEFAULT_TRANSLATION_SERVICE = 'libre'  # Default to free LibreTranslate
+DEFAULT_TRANSLATION_SERVICE = 'deepl'
 if TRANSLATION_SERVICES['google']['api_key']:
     DEFAULT_TRANSLATION_SERVICE = 'google'  # Use Google if API key is available

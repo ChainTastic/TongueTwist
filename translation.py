@@ -26,6 +26,11 @@ class TranslationService:
                 'calls': 0,
                 'reset_time': time.time() + 60,
                 'limit': 100  # LibreTranslate estimated limit
+            },
+            'deepl': {
+                'calls': 0,
+                'reset_time': time.time() + 60,
+                'limit': 50
             }
         }
     
@@ -75,6 +80,8 @@ class TranslationService:
             return await self._translate_google(text, target_lang, source_lang)
         elif self.service == 'libre':
             return await self._translate_libre(text, target_lang, source_lang)
+        elif self.service == 'deepl':
+            return await self._translate_deepl(text, target_lang, source_lang)
         else:
             logger.error(f"Unknown translation service: {self.service}")
             return text
@@ -168,6 +175,48 @@ class TranslationService:
                 return f"[Translation request error] {text}"
         except Exception as e:
             logger.error(f"Error translating with LibreTranslate: {e}")
+            return f"[Translation failed] {text}"
+
+    async def _translate_deepl(self, text: str, target_lang: str, source_lang: Optional[str] = None) -> str:
+        """Translate text using DeepL API"""
+        try:
+            api_key = TRANSLATION_SERVICES['deepl']['api_key']
+            base_url = TRANSLATION_SERVICES['deepl'].get('base_url', 'https://api-free.deepl.com/v2/translate')
+
+            if not api_key:
+                logger.error("DeepL API key not set")
+                return text
+
+            session = await self.get_session()
+
+            payload = {
+                'auth_key': api_key,
+                'text': text,
+                'target_lang': target_lang.upper()
+            }
+
+            if source_lang and source_lang.lower() != 'auto':
+                payload['source_lang'] = source_lang.upper()
+
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.post(base_url, data=payload, timeout=timeout) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'translations' in data and len(data['translations']) > 0:
+                        return data['translations'][0]['text']
+                    else:
+                        logger.error(f"Unexpected DeepL API response: {data}")
+                        return f"[Translation format error] {text}"
+                else:
+                    error_text = await response.text()
+                    logger.error(f"DeepL API error: {response.status} - {error_text}")
+                    return f"[{target_lang}] {text}"
+
+        except (asyncio.TimeoutError, ClientConnectionError) as timeout_error:
+            logger.warning(f"DeepL request timed out or failed: {timeout_error}")
+            return f"[Translation timeout] {text}"
+        except Exception as e:
+            logger.error(f"Error translating with DeepL: {e}")
             return f"[Translation failed] {text}"
     
     async def detect_language(self, text: str) -> str:
