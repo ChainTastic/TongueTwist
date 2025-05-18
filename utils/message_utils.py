@@ -3,6 +3,7 @@ from typing import Optional
 import logging
 
 from config import CONFIG, LANGUAGE_TO_FLAG
+from translation import translation_service
 from utils.language_utils import get_language_name
 
 logger = logging.getLogger('discord')
